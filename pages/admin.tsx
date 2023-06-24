@@ -138,10 +138,30 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
         destination: '/api/auth/login',
       },
       props: {},
-    }
+    };
+  }
+
+  const user = await prisma.user.findUnique({
+    select: {
+      email: true,
+      role: true,
+    },
+    where: {
+      email: session.user.email,
+    },
+  });
+
+  if (!user || user.role !== 'ADMIN') {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/404',
+      },
+      props: {},
+    };
   }
 
   return {
     props: {},
   };
-}
+};

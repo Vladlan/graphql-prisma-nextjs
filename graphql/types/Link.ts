@@ -38,6 +38,16 @@ builder.mutationField("createLink", (t) =>
         throw new Error("You have to be logged in to perform this action");
       }
 
+      const user = await prisma.user.findUnique({
+        where: {
+          email: (await ctx).user?.email,
+        },
+      });
+
+      if (!user || user.role !== "ADMIN") {
+        throw new Error("You don have permission ot perform this action");
+      }
+
       // To fix ids not incrementing
       // await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Link"', 'id'), coalesce(max(id)+1, 1), false) FROM "Link";`
 
